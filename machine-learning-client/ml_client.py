@@ -1,3 +1,4 @@
+"""Machine learning client for audio speech analysis."""
 import re
 import sys
 import librosa
@@ -8,6 +9,7 @@ FILLER_WORDS = {"um", "uh", "like"}
 
 
 def count_filler_words(transcript):
+    """Count the number of filler words in a transcript."""
     total = 0
     transcript_lower = transcript.lower()
     transcript_clean = re.sub(r"[^\w\s]", "", transcript_lower)
@@ -18,11 +20,13 @@ def count_filler_words(transcript):
 
 
 def transcribe_audio(audio_path, model):
+    """Transcribe audio file using Whisper model."""
     transcript_result = model.transcribe(audio_path, initial_prompt="Um, uh, like")
     return transcript_result["text"].strip()
 
 
 def compute_words_per_minute(transcript, duration_seconds):
+    """Compute words per minute from transcript and duration."""
     if duration_seconds <= 0:
         return 0.0
     word_count = len(transcript.split())
@@ -30,6 +34,7 @@ def compute_words_per_minute(transcript, duration_seconds):
 
 
 def analyze_audio(audio_path):
+    """Analyze audio file and return acoustic features."""
     y, sr = librosa.load(audio_path, sr=None)
     duration_seconds = librosa.get_duration(y=y, sr=sr)
 
@@ -50,6 +55,7 @@ def analyze_audio(audio_path):
 
 
 def run_test(audio_path):
+    """Run full analysis pipeline on audio file."""
     model = whisper.load_model("base")
     print("whisper model loaded\n")
 
@@ -75,3 +81,4 @@ if __name__ == "__main__":
         print("Example: pipenv run python test_ml.py test_audio.wav")
         sys.exit(1)
     run_test(sys.argv[1])
+    
