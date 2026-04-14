@@ -1,4 +1,5 @@
 """Machine learning client for audio speech analysis."""
+
 import re
 import sys
 import librosa
@@ -81,4 +82,3 @@ if __name__ == "__main__":
         print("Example: pipenv run python test_ml.py test_audio.wav")
         sys.exit(1)
     run_test(sys.argv[1])
-    
