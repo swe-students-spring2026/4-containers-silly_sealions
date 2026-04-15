@@ -1,11 +1,14 @@
 """Machine learning client for audio speech analysis."""
-
 import re
-import sys
+import uuid
+from datetime import datetime
 import librosa
 import numpy as np
 import whisper
+from db import speeches_collection
+from flask import Flask, request, jsonify
 
+app = Flask(__name__)
 FILLER_WORDS = {"um", "uh", "like"}
 
 
@@ -53,7 +56,29 @@ def analyze_audio(audio_path):
         "avg_volume_db": avg_volume_db,
         "pitch_variance": pitch_variance,
     }
+def rate_volume(avg_vol_db):
+    """Gives the volume of the speech a rating"""
+    if avg_vol_db < -40:
+        return "too quiet"
+    if avg_vol_db > -10: 
+        return "too loud"
+    return "good"
 
+def rate_pitch(pitch_var):
+    """Gives the pitch variance of the speech a rating"""
+    if pitch_var < 50:
+        return "monotone"
+    if pitch_var > 2000: 
+        return "too varied"
+    return "good"
+
+def rate_pace(pace):
+    """Gives the pace of the speech a rating"""
+    if pace < 100:
+        return "too slow"
+    if pace > 190: 
+        return "too fast"
+    return "good"
 
 def run_test(audio_path):
     """Run full analysis pipeline on audio file."""
@@ -75,10 +100,37 @@ def run_test(audio_path):
     print(f"Pitch variance:    {acoustic['pitch_variance']}")
     print(f"Filler word total: {filler}")
 
+@app.route("/analyze", methods=["POST"])
+def analyze():
+    """Recieve audio files and run speech analysis"""
+    if "audio" not in request.files:
+        return jsonify({"error": "no audio file"}), 400
+    audio_file = request.files["audio"]
+    audio_path = f"/tmp/{uuid.uuid4()}_{audio_file.filename}"
+    audio_file.save(audio_path)
+
+    model = whisper.load_model("base")
+
+    transcript = transcribe_audio(audio_path, model)
+    acoustic = analyze_audio(audio_path)
+    filler = count_filler_words(transcript)
+    wpm = compute_words_per_minute(transcript, acoustic["duration_seconds"])
+    volume_rating = rate_volume(acoustic["avg_volume_db"])
+    pitch_rating = rate_pitch(acoustic["pitch_vaiance"])
+    pace_rating = rate_pace(wpm)
+
+    result = {
+        "user_id": request.form.get("user_id"),
+        "title": request.form.get("title"),
+        "timestamp": datetime.utcnow(),
+        "transcript": transcript,
+        "wmp": wpm,
+        "filler_count": filler,
+        "volume_rating": volume_rating,
+        "pitch_rating": pitch_rating,
+        "pace_rating": pace_rating,
+    }
+    speeches_collection.insert_one(result)
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: pipenv run python test_ml.py <path_to_audio_file>")
-        print("Example: pipenv run python test_ml.py test_audio.wav")
-        sys.exit(1)
-    run_test(sys.argv[1])
+    app.run(host="0.0.0.0", port=5001)
