@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card">
+    <h2>🎤 Record New Speech</h2>
+
+    <form method="POST" action="/submit" enctype="multipart/form-data">
+        <input name="title" placeholder="Enter speech title..." required />
+
+        <input type="file" id="audioFile" name="audio" hidden />
+
+        <button type="button" class="btn-danger" onclick="startRecording()">Start Recording</button>
+        <button type="button" class="btn-secondary" onclick="stopRecording()">Stop Recording</button>
+
+        <p class="status" id="status">Not recording</p>
+
+        <audio id="preview" controls style="display:none; margin-top:10px;"></audio>
+
+        <button type="submit" class="btn-success">Submit Speech</button>
+    </form>
+</div>
+
+<script>
+let mediaRecorder;
+let audioChunks = [];
+
+async function startRecording() {
+    audioChunks = [];
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    mediaRecorder = new MediaRecorder(stream);
+
+    mediaRecorder.ondataavailable = e => {
+        audioChunks.push(e.data);
+    };
+
+    mediaRecorder.start();
+    document.getElementById("status").innerText = "Recording...";
+}
+
+function stopRecording() {
+    mediaRecorder.stop();
+
+    mediaRecorder.onstop = () => {
+        const blob = new Blob(audioChunks, { type: "audio/webm" });
+
+        const audioURL = URL.createObjectURL(blob);
+        const preview = document.getElementById("preview");
+        preview.src = audioURL;
+        preview.style.display = "block";
+
+        const file = new File([blob], "recording.webm");
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        document.getElementById("audioFile").files = dt.files;
+
+        document.getElementById("status").innerText = "Recording complete ✅";
+    };
+}
+</script>
+
+{% endblock %}
