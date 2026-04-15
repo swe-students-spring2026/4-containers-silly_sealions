@@ -2,7 +2,11 @@
 import os
 from pymongo import MongoClient
 
-client = MongoClient(os.getenv("MONGO_URI", "mongodb://mongodb:27017/"))
-db = client["speech_rater"]
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/speech_rater")
 
+client = MongoClient(MONGO_URI)
+
+db = client.get_default_database()
+
+users_collection = db["users"]
 speeches_collection = db["speeches"]
