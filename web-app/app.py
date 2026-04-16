@@ -4,6 +4,8 @@ import datetime
 import ffmpeg
 from dotenv import load_dotenv
 
+load_dotenv()
+
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_login import (
     LoginManager,
@@ -27,10 +29,9 @@ login_manager = LoginManager(app)
 login_manager.login_view = "login"
 login_manager.login_message = None
 
-load_dotenv()
-
 class User(UserMixin):
     """User functions to create and search for users"""
+
     def __init__(self, doc):
         """Initialize user from MongDB"""
         self.id = str(doc["_id"])
@@ -117,7 +118,7 @@ def signup():
             flash("Please enter a password.")
             return render_template("signup.html")
         if password != password_check:
-            flash("Passwords do not match")
+            flash("Passwords do not match.")
             return render_template("signup.html")
 
         user = User.create(username, password)
@@ -171,7 +172,7 @@ def delete(speech_id):
 @app.route("/submit", methods=["POST"])
 @login_required
 def submit():
-    """Sends the audio file and the name of the speech to the ML client."""
+    """Sends a .wav audio file and the name of the speech to the ML client."""
     title = (request.form.get("title") or "").strip()
     audio_file = request.files.get("audio")
 
@@ -183,7 +184,6 @@ def submit():
         flash("Please record your speech before submitting.")
         return redirect(url_for("record"))
 
-    # save original webm file
     webm_path = f"temp_{current_user.id}.webm"
     wav_path = f"temp_{current_user.id}.wav"
     audio_file.save(webm_path)
@@ -203,11 +203,8 @@ def submit():
                 files={"audio": f},
                 data={
                     "title": title,
-                    "user_id": current_user.id,
-                },
-                timeout=60,
-            )
-
+                    "user_id": current_user.id,},
+                timeout=60,)
         if response.status_code != 200:
             flash("Something went wrong analyzing your speech. Please try again.")
             return redirect(url_for("record"))
