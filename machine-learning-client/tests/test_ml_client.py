@@ -181,6 +181,7 @@ def test_analyze_success(flask_client, mocker):
         },
     )
     mocker.patch("ml_client.speeches_collection.insert_one", return_value=MagicMock())
+    mocker.patch("werkzeug.datastructures.FileStorage.save")
     data = {
         "audio": (io.BytesIO(b"fake audio content"), "audio_test.wav"),
         "title": "Test Speech",
