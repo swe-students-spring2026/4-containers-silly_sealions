@@ -109,7 +109,7 @@ def test_rate_pace_too_slow():
 
 def test_rate_pace_too_fast():
     """Test pace rated as too fast"""
-    assert rate_pace(180) == "too fast"
+    assert rate_pace(191) == "too fast"
 
 
 def test_rate_pace_good():
