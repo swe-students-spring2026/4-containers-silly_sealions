@@ -22,4 +22,4 @@ jobs:
           pip install pipenv
           pipenv install --python 3.11
       - name: Run tests
-        run: pipenv run pytest tests/ -v --cov=app
+        run: pipenv run python -m pytest tests/ -v
