@@ -1,4 +1,5 @@
 """Flask web application for SpeechCoach."""
+
 import datetime
 import os
 
@@ -32,6 +33,7 @@ login_manager = LoginManager(app)
 login_manager.login_view = "login"
 login_manager.login_message = None
 
+
 class User(UserMixin):
     """User functions to create and search for users"""
 
@@ -54,9 +56,7 @@ class User(UserMixin):
             return None
         doc = {
             "username": username,
-            "password_hash": generate_password_hash(
-                password, method="pbkdf2:sha256"
-            ),
+            "password_hash": generate_password_hash(password, method="pbkdf2:sha256"),
             "created_at": datetime.datetime.utcnow(),
         }
         ins = users_coll.insert_one(doc)
@@ -73,11 +73,13 @@ def load_user(user_id):
         return None
     return User(doc) if doc else None
 
+
 @app.route("/")
 @login_required
 def index():
     """Redirects automatically to dashboard."""
     return redirect(url_for("dashboard"))
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -102,6 +104,7 @@ def login():
         login_user(user)
         return redirect(url_for("dashboard"))
     return render_template("login.html")
+
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -130,12 +133,14 @@ def signup():
         return redirect(url_for("dashboard"))
     return render_template("signup.html")
 
+
 @app.route("/logout")
 def logout():
     """Log out of current user"""
     logout_user()
     session.pop("_flashes", None)
     return redirect(url_for("login"))
+
 
 @app.route("/dashboard")
 @login_required
@@ -146,11 +151,13 @@ def dashboard():
         doc["id"] = str(doc["_id"])
     return render_template("dashboard.html", speeches=docs, user=current_user)
 
+
 @app.route("/record")
 @login_required
 def record():
     """This will be the page that users record and name their speech."""
     return render_template("record.html")
+
 
 @app.route("/delete/<speech_id>", methods=["POST"])
 @login_required
@@ -161,12 +168,10 @@ def delete(speech_id):
     except InvalidId:
         flash("Invalid speech id.")
         return redirect(url_for("dashboard"))
-    speeches_coll.delete_one({
-        "_id": oid,
-        "user_id": current_user.id
-    })
+    speeches_coll.delete_one({"_id": oid, "user_id": current_user.id})
     flash("Speech deleted.")
     return redirect(url_for("dashboard"))
+
 
 @app.route("/submit", methods=["POST"])
 @login_required
@@ -202,8 +207,10 @@ def submit():
                 files={"audio": f},
                 data={
                     "title": title,
-                    "user_id": current_user.id,},
-                timeout=60,)
+                    "user_id": current_user.id,
+                },
+                timeout=60,
+            )
         if response.status_code != 200:
             flash("Something went wrong analyzing your speech. Please try again.")
             return redirect(url_for("record"))
@@ -220,6 +227,7 @@ def submit():
 
     flash("Speech analyzed successfully!")
     return redirect(url_for("dashboard"))
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5002, debug=True)

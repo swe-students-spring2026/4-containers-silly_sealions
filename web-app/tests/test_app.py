@@ -1,4 +1,5 @@
 """Tests for the web application."""
+
 import datetime
 
 import pytest
