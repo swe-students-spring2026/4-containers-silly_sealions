@@ -7,6 +7,7 @@ import pytest
 sys.modules['whisper'] = MagicMock()
 sys.modules['librosa'] = MagicMock()
 sys.modules['numpy'] = MagicMock()
+sys.modules['db'] = MagicMock()
 
 from ml_client import (
     count_filler_words,
