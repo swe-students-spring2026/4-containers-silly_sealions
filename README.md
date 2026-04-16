@@ -1,4 +1,6 @@
 ![Lint-free](https://github.com/nyu-software-engineering/containerized-app-exercise/actions/workflows/lint.yml/badge.svg)
+![ML Client CI](https://github.com/swe-students-spring2026/4-containers-silly_sealions/actions/workflows/ml-client-ci.yml/badge.svg)
+![Web App CI](https://github.com/swe-students-spring2026/4-containers-silly_sealions/actions/workflows/buildapp.yml/badge.svg)
 
 # SpeechCoach
 
@@ -142,6 +144,9 @@ Build and start all services
 
     docker-compose up --build
 
+Then open
+
+    http://localhost:5002/
 Stop services
 
     docker-compose down
@@ -185,10 +190,12 @@ The project uses GitHub Actions for CI. Checks include:
 
 ## Team Responsibilities
 
-- **Sasha** – web app backend
-- **Chris + Samay** – frontend templates and styling
-- **Claire** – machine learning client
-- **Valeria** – Docker and web app container setup
+## Team Responsibilities
+
+- **[Sasha](https://github.com/sashacartagena)** – web app backend
+- **[Chris](https://github.com/ChrisC0205) + [Samay](https://github.com/samaythe1)** – frontend templates and styling
+- **[Claire](https://github.com/ClaireBocz)** – machine learning client
+- **[Valeria](https://github.com/ValeriaChang)** – Docker and web app container setup
 
 ## Notes
 
