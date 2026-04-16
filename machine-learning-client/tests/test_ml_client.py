@@ -177,7 +177,7 @@ def test_analyze_success(flask_client, mocker):
         return_value={
             "duration_seconds": 30.0,
             "avg_volume_db": -20.0,
-            "pitch_variance": 500.0,
+            "pitch_variance": 400.0,
         },
     )
     mocker.patch("ml_client.speeches_collection.insert_one", return_value=MagicMock())
