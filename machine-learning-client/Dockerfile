@@ -12,6 +12,8 @@ RUN pip install --no-cache-dir pipenv
 COPY Pipfile Pipfile.lock ./
 RUN pipenv install --system --ignore-pipfile
 
+RUN pip install openai-whisper librosa numpy soundfile
+
 COPY . .
 
 EXPOSE 5001

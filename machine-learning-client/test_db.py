@@ -1,7 +1,6 @@
 """Tests for database connection."""
 from db import speeches_collection
 # pylint: disable=import-error
-# pylint: disable=redefined-outer-name
 
 
 def test_db_connection():
